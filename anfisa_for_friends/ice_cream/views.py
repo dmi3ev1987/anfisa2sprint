@@ -1,10 +1,26 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
+
+from ice_cream.models import IceCream
 
 
 def ice_cream_detail(request, pk):
-    template = 'ice_cream/detail.html'
-    context = {}
-    return render(request, template, context)
+    template_name = 'ice_cream/detail.html'
+    # Вызываем .get() и в его параметрах указываем условия фильтрации:
+    # ice_cream = IceCream.objects.get(pk=pk)
+    # Отфильтруй объект модели IceCream,
+    # у которого pk равен значению переменной из пути.
+    # Если такого объекта не существует - верни 404 ошибку:
+    # ice_cream = get_object_or_404(IceCream, pk=pk)
+    ice_cream = get_object_or_404(
+        IceCream.objects.values(
+            'title', 'description'
+        ).filter(is_published=True),
+        pk=pk
+    )
+    context = {
+        'ice_cream': ice_cream,
+    }
+    return render(request, template_name, context)
 
 
 def ice_cream_list(request):
